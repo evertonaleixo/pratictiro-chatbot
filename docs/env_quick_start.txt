@@ -1,0 +1,4 @@
+https://github.com/CommunityBootcamp/Maratona-BOTs
+
+With node:
+https://github.com/CommunityBootcamp/Maratona-BOTs/blob/master/QuickStart/configurando-ambiente-nodejs.md
