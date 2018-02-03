@@ -1,5 +1,7 @@
+var PreRegister = require('./dialogs/pre-register.js');
 var restify = require('restify');
 var builder = require('botbuilder');
+var inMemoryStorage = new builder.MemoryBotStorage();
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -22,5 +24,10 @@ server.post('/api/messages', connector.listen());
 // Recebe as mensagens do usuário e responde repetindo cada mensagem (prefixado com 'Você disse:')
 var bot = new builder.UniversalBot(connector, function (session) {
     session.send("Você disse: %s", session.message.text);
-});
+    if(session.message.text.startsWith("quero")) {
+        session.beginDialog("pre-register");
+    }
+}).set('storage', inMemoryStorage);
 
+console.log(PreRegister);
+PreRegister.preRegister(bot, );
