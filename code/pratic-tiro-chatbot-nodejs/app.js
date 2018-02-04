@@ -1,4 +1,7 @@
 var PreRegister = require('./dialogs/pre-register.js');
+var Flux = require('./dialogs/flux.js');
+var Faq = require('./dialogs/faq.js');
+
 var restify = require('restify');
 var builder = require('botbuilder');
 var inMemoryStorage = new builder.MemoryBotStorage();
@@ -29,5 +32,38 @@ var bot = new builder.UniversalBot(connector, function (session) {
     }
 }).set('storage', inMemoryStorage);
 
-console.log(PreRegister);
-PreRegister.preRegister(bot, );
+PreRegister.preRegister(bot);
+Flux.flux(bot);
+Faq.faq(bot);
+
+bot.on('conversationUpdate', function (message) {
+    
+    if (message.membersAdded && message.membersAdded.length > 0) {
+        if(message.membersAdded[0].id == 'default-bot'){
+            return;
+        }
+        var isGroup = message.address.conversation.isGroup;
+        var txt = isGroup ? "Ola a todos!" : "Ola!";
+        txt = txt + " Eu sou o T-800. Sou um Robo e novo funcionário da Pratic Tiro! Minha missão é esclarecer suas dúvidas e auxiliar os primeiros passos de seu treinamento."
+        var reply = new builder.Message()
+                .address(message.address)
+                .text(txt);
+        bot.send(reply);
+
+        var prompt = new builder.PromptChoice('Por onde começaremos?', ["Tirar dúvidas","Inscrever"], { listStyle: builder.ListStyle.button })
+        bot.beginDialog(message.address, "*:flux");
+    } else if (message.membersRemoved) {
+        // See if bot was removed
+        var botId = message.address.bot.id;
+        for (var i = 0; i < message.membersRemoved.length; i++) {
+            if (message.membersRemoved[i].id === botId) {
+                // Say goodbye
+                var reply = new builder.Message()
+                        .address(message.address)
+                        .text("Obrigado! Até mais.");
+                bot.send(reply);
+                break;
+            }
+        }
+    }
+});
